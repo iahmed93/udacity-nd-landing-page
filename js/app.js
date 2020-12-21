@@ -21,6 +21,7 @@
 const activeClassName = 'your-active-class';
 const sections = [];
 let currentActiveSectionId = null;
+let activeNavbarElement = null;
 
 /**
  * End Global Variables
@@ -41,6 +42,30 @@ const fillSectionsArray = () => {
     }
 }
 
+const isInViewport = (el) => {
+    const rect = el.getBoundingClientRect();
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+}
+
+const setActiveSection = (section) => {
+    const lastActiveSection = document.querySelector(`#${currentActiveSectionId}`);
+    lastActiveSection.classList.remove(activeClassName);
+    section.classList.add(activeClassName);
+    currentActiveSectionId = section.getAttribute('id');
+}
+
+const setActiveNavbarLink = (navbarElement) => {
+    navbarElement.classList.add('active-link');
+    if (activeNavbarElement && activeNavbarElement.getAttribute('id') != navbarElement.getAttribute('id')){
+        activeNavbarElement.classList.remove('active-link');
+    }
+    activeNavbarElement = navbarElement;
+}
 
 /**
  * End Helper Functions
@@ -59,6 +84,7 @@ const buildNav = () => {
 
         menuLink.setAttribute('href', section.id);
         menuLink.setAttribute('class', 'menu__link');
+        menuLink.setAttribute('id', section.id + '-nav')
         menuLink.textContent = section.name;
 
         listItem.appendChild(menuLink);
@@ -70,19 +96,28 @@ const buildNav = () => {
 }
 
 // Add class 'active' to section when near top of viewport
-
+const findSectionInViewPort = () => {
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    for (let section of sections) {
+        const sectionElement = document.querySelector(`#${section.id}`);
+        if(isInViewport(sectionElement)){
+            setActiveSection(sectionElement);
+            const navElement = document.querySelector(`#${section.id}-nav`);
+            setActiveNavbarLink(navElement);
+        }
+    }
+}
 
 // Scroll to anchor ID using scrollTO event
 const scrollToSection = (event) => {
     event.preventDefault();
     if(event.target.nodeName == 'A') {
         const id = event.target.getAttribute('href');
+        setActiveNavbarLink(event.target);
         const section = document.querySelector(`#${id}`);
         section.scrollIntoView({ behavior: 'smooth', block: 'start'});
-        const lastActiveSection = document.querySelector(`#${currentActiveSectionId}`);
-        lastActiveSection.classList.remove(activeClassName);
-        section.classList.add(activeClassName);
-        currentActiveSectionId = id;
+        setActiveSection(section);
     }
 }
 
@@ -100,3 +135,5 @@ const navbarList = document.querySelector('#navbar__list');
 navbarList.addEventListener('click', scrollToSection);
 
 // Set sections as active
+
+document.addEventListener('scroll', findSectionInViewPort);
