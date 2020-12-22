@@ -42,13 +42,11 @@ const fillSectionsArray = () => {
     }
 }
 
-const isInViewport = (el) => {
-    const rect = el.getBoundingClientRect();
+const isSectionInViewport = (section) => {
+    const sectionRect = section.getBoundingClientRect();
     return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        sectionRect.top >= 0 && sectionRect.bottom <= window.innerHeight &&
+        sectionRect.left >= 0 && sectionRect.right <= window.innerWidth
     );
 }
 
@@ -101,7 +99,7 @@ const findSectionInViewPort = () => {
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
     for (let section of sections) {
         const sectionElement = document.querySelector(`#${section.id}`);
-        if(isInViewport(sectionElement)){
+        if(isSectionInViewport(sectionElement)){
             setActiveSection(sectionElement);
             const navElement = document.querySelector(`#${section.id}-nav`);
             setActiveNavbarLink(navElement);
