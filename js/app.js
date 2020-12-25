@@ -44,9 +44,12 @@ const fillSectionsArray = () => {
 
 const isSectionInViewport = (section) => {
     const sectionRect = section.getBoundingClientRect();
+    const mainElement = document.querySelector('main');
     return (
-        sectionRect.top >= 0 && sectionRect.bottom <= window.innerHeight &&
-        sectionRect.left >= 0 && sectionRect.right <= window.innerWidth
+        sectionRect.top >= 0 
+        && (sectionRect.bottom <= window.innerHeight || sectionRect.bottom <= mainElement.clientHeight)
+        // && sectionRect.left >= 0 
+        // && sectionRect.right <= window.innerWidth
     );
 }
 
@@ -103,6 +106,7 @@ const findSectionInViewPort = () => {
             setActiveSection(sectionElement);
             const navElement = document.querySelector(`#${section.id}-nav`);
             setActiveNavbarLink(navElement);
+            break;
         }
     }
 }
